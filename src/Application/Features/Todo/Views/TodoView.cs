@@ -1,9 +1,10 @@
 ﻿namespace Application.Features.Todo.Views;
 
-public class TodoView : BaseView
+public class TodoView : CreateTodoView
 {
-    public string Title { get; set; } = string.Empty;
-    public string? Description { get; set; } = string.Empty;
-    public DateTime? Deadline { get; set; }
+    public Guid Id { get; set; }
     public bool IsDone { get; set; }
+    public DateTime CreatedAt { get; set; }
+    public DateTime UpdatedAt { get; set; }
+    public Status Status { get; set; }
 }

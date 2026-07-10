@@ -1,8 +1,14 @@
-﻿global using Application.Common.Exceptions;
+﻿global using Application.Common.Interfaces;
 global using Domain.Enums;
 global using Domain.Common;
 global using Application.Common.Base;
 global using Application.Features.Todo.Views;
 global using Application.Common.Extensions;
-global using Application.Features.Todo.Commands;
+global using Application.Features.Todo.Mapping;
+global using Application.Common.Exceptions;
+global using Domain.Entities;
+global using Microsoft.EntityFrameworkCore;
+global using System.Linq.Expressions;
+global using Riok.Mapperly.Abstractions;
 global using PediatR;
+global using FluentValidation;

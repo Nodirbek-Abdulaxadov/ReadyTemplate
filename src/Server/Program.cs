@@ -1,10 +1,3 @@
-using Application;
-using Infrastructure;
-using Infrastructure.Data;
-using Microsoft.EntityFrameworkCore;
-using Server.Endpoints;
-using Server.Infrastructure;
-
 var builder = WebApplication.CreateBuilder(args);
 var services = builder.Services;
 var cfg = builder.Configuration;
@@ -16,6 +9,7 @@ services.AddOpenApiDocument(settings =>
     settings.Title = "ReadyTemplate swagger api docs";
 });
 
+services.AddHealthChecks();
 services.AddHttpContextAccessor();
 services.AddScoped<ICurrentRequestService, CurrentRequestService>();
 services.AddApplication();
@@ -37,14 +31,13 @@ if (app.Environment.IsDevelopment())
 {
     app.UseOpenApi();
     app.UseSwaggerUi();
-
-    using var scope = app.Services.CreateScope();
-    await scope.ServiceProvider.GetRequiredService<ApplicationDbContext>()
-                 .Database.MigrateAsync();
 }
 
+app.MapHealthEndpoints();
 app.UseHttpsRedirection();
 app.UseCors();
 app.MapTodoEndpoints();
+
+await DefaultDataInitializerService.InitializeDatabaseAsync(app.Services);
 
 app.Run();

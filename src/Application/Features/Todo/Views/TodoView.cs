@@ -6,5 +6,4 @@ public class TodoView : CreateTodoView
     public bool IsDone { get; set; }
     public DateTime CreatedAt { get; set; }
     public DateTime UpdatedAt { get; set; }
-    public Status Status { get; set; }
 }

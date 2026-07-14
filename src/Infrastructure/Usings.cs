@@ -1,7 +1,13 @@
-﻿namespace Infrastructure
-{
-    public class Usings
-    {
-
-    }
-}
+﻿global using Application.Common.Interfaces;
+global using Domain.Entities;
+global using Microsoft.EntityFrameworkCore;
+global using System.Reflection;
+global using Infrastructure.Data;
+global using Microsoft.Extensions.Configuration;
+global using Microsoft.Extensions.DependencyInjection;
+global using Application.Features.Todo;
+global using Domain.Common;
+global using Domain.Enums;
+global using Microsoft.EntityFrameworkCore.Diagnostics;
+global using Microsoft.EntityFrameworkCore.Metadata.Builders;
+global using Infrastructure.Data.Interceptors;

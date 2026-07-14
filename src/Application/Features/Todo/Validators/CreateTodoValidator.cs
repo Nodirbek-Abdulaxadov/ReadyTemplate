@@ -1,8 +1,8 @@
 ﻿namespace Application.Features.Todo.Validators;
 
-public class CreateTodoValidator : AbstractValidator<CreateTodoView>
+public class CreateTodoViewValidator : AbstractValidator<CreateTodoView>
 {
-    public CreateTodoValidator()
+    public CreateTodoViewValidator()
     {
         RuleFor(x => x.Title)
             .NotEmpty()
@@ -10,7 +10,13 @@ public class CreateTodoValidator : AbstractValidator<CreateTodoView>
             .MaximumLength(200);
 
         RuleFor(x => x.Deadline)
-            .GreaterThan(DateTime.UtcNow)
+            .GreaterThan(DateTimeOffset.UtcNow)
             .When(x => x.Deadline.HasValue);
     }
+}
+
+public class CreateTodoValidator : AbstractValidator<CreateTodoCommand>
+{
+    public CreateTodoValidator()
+        => RuleFor(x => x.View).SetValidator(new CreateTodoViewValidator());
 }

@@ -1,41 +1,50 @@
-var builder = WebApplication.CreateBuilder(args);
+using Application;
+using Infrastructure;
+using Infrastructure.Data;
+using Microsoft.EntityFrameworkCore;
+using Server.Endpoints;
+using Server.Infrastructure;
 
-// Add services to the container.
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-builder.Services.AddOpenApi();
+var builder = WebApplication.CreateBuilder(args);
+var services = builder.Services;
+var cfg = builder.Configuration;
+
+services.AddEndpointsApiExplorer();
+services.AddOpenApiDocument(settings =>
+{
+    settings.DocumentName = "v1";
+    settings.Title = "ReadyTemplate swagger api docs";
+});
+
+services.AddHttpContextAccessor();
+services.AddScoped<ICurrentRequestService, CurrentRequestService>();
+services.AddApplication();
+services.AddInfrastructure(cfg);
+
+services.AddCors(o => o.AddDefaultPolicy(p => p
+    .WithOrigins(cfg.GetSection("Cors:Origins").Get<string[]>() ?? [])
+    .AllowAnyHeader()
+    .AllowAnyMethod())); 
+
+services.AddProblemDetails();
+services.AddExceptionHandler<GlobalExceptionHandler>();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+app.UseExceptionHandler();
+
 if (app.Environment.IsDevelopment())
 {
-    app.MapOpenApi();
+    app.UseOpenApi();
+    app.UseSwaggerUi();
+
+    using var scope = app.Services.CreateScope();
+    await scope.ServiceProvider.GetRequiredService<ApplicationDbContext>()
+                 .Database.MigrateAsync();
 }
 
 app.UseHttpsRedirection();
-
-var summaries = new[]
-{
-    "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-};
-
-app.MapGet("/weatherforecast", () =>
-{
-    var forecast =  Enumerable.Range(1, 5).Select(index =>
-        new WeatherForecast
-        (
-            DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
-            Random.Shared.Next(-20, 55),
-            summaries[Random.Shared.Next(summaries.Length)]
-        ))
-        .ToArray();
-    return forecast;
-})
-.WithName("GetWeatherForecast");
+app.UseCors();
+app.MapTodoEndpoints();
 
 app.Run();
-
-record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
-{
-    public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
-}

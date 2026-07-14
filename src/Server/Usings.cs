@@ -1,0 +1,10 @@
+﻿global using Application.Common.Interfaces;
+global using Application.Common.Exceptions;
+global using Microsoft.AspNetCore.Diagnostics;
+global using Microsoft.AspNetCore.Mvc;
+global using FluentValidation;
+global using Application.Common.Extensions;
+global using Application.Features.Todo.Commands;
+global using Application.Features.Todo.Views;
+global using Application.Features.Todo;
+global using PediatR;

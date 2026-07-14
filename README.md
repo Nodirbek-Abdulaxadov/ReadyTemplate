@@ -1,5 +1,7 @@
 # ReadyTemplate
 
+[![Build](https://github.com/Nodirbek-Abdulaxadov/ReadyTemplate/actions/workflows/build.yml/badge.svg)](https://github.com/Nodirbek-Abdulaxadov/ReadyTemplate/actions/workflows/build.yml)
+
 A ready-to-use **.NET 10** Web API template built with Clean Architecture, minimal APIs, and PostgreSQL. Clone it, rename it, and start building features — the plumbing is already done.
 
 ## Features
@@ -16,12 +18,18 @@ A ready-to-use **.NET 10** Web API template built with Clean Architecture, minim
 - 📄 **Table queries out of the box** — paging, sorting, search, and date-range filtering via `TableOptions` / `TableResponse<T>`
 - 🚨 **Global exception handling** — `ProblemDetails` responses with custom `NotFoundException` / `BadRequestException`
 - 📖 **Swagger (NSwag)** — enabled in Development
-- 🐳 **Docker Compose** — PostgreSQL 17 with health check, configured via `.env`
+- 🐳 **Docker** — multi-stage `Dockerfile` for the API + Docker Compose for PostgreSQL 17
 - 🔄 **Auto-migrations** — database is migrated on startup in Development
+- 🧹 **Code quality built in** — `Directory.Build.props` with .NET analyzers (`latest-recommended`) + a full `.editorconfig`, enforced on every build
+- 🔁 **CI with GitHub Actions** — build with `-warnaserror` + Docker image check on every push/PR
 
 ## Project Structure
 
 ```
+.github/workflows/build.yml  # CI: build (-warnaserror) + Docker image
+Directory.Build.props        # Shared MSBuild settings for all projects
+.editorconfig                # Code style & analyzer rules
+docker-compose.yml           # PostgreSQL 17 for local development
 src/
 ├── Domain/                  # Entities, enums, base types — no dependencies
 │   ├── Common/              #   BaseEntity (Id, CreatedAt, UpdatedAt, Status)
@@ -42,6 +50,7 @@ src/
 │   │                        #   AuditInterceptor (audit trail)
 │   └── Migrations/
 └── Server/                  # ASP.NET Core host
+    ├── Dockerfile           #   Multi-stage image build (context = repo root)
     ├── Endpoints/           #   Minimal API endpoint groups
     └── Infrastructure/      #   CurrentRequestService, GlobalExceptionHandler
 ```
@@ -70,6 +79,14 @@ In Development the app applies EF migrations automatically and opens Swagger UI:
 
 - Swagger: http://localhost:5246/swagger
 - API base: `http://localhost:5246/api`
+
+### 3. (Optional) Build the API as a Docker image
+
+```bash
+docker build -f src/Server/Dockerfile -t readytemplate .
+```
+
+> The Dockerfile context is the repo root (it needs `Directory.Build.props`), so always build from the repository root.
 
 ## Example Endpoints (Todo)
 
@@ -116,6 +133,15 @@ The `Todo` feature is the reference implementation. To add e.g. `Product`:
 5. **Register** — add `services.AddScoped<ProductFeatures>()` in `Application/DependencyInjection.cs`.
 
 Timestamps, soft delete, and audit logging work automatically for any entity inheriting `BaseEntity` — no extra code needed.
+
+## Code Quality & CI
+
+- **`Directory.Build.props`** centralizes `TargetFramework`, `Nullable`, `ImplicitUsings`, and analyzer settings for every project — individual `.csproj` files only declare packages and project references.
+- **.NET analyzers** run at `latest-recommended` level with `EnforceCodeStyleInBuild`; EF migrations are excluded as generated code.
+- **`.editorconfig`** defines naming rules, formatting (Allman braces), and modern C# style preferences matching the codebase.
+- **GitHub Actions** (`.github/workflows/build.yml`) runs on every push/PR to `master`:
+  - `dotnet build -c Release -warnaserror` — any analyzer warning fails the build
+  - `docker build` — verifies the API image still builds
 
 ## Configuration
 

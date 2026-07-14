@@ -1,0 +1,16 @@
+{
+  "$schema": "./schemas/stylecop.schema.json",
+  "settings": {
+    "documentationRules": {
+      "companyName": "TelecomSofts",
+      "documentExposedElements": false,
+      "documentInternalElements": false,
+      "documentPrivateElements": false,
+      "documentInterfaces": false
+    },
+    "orderingRules": {
+      "systemUsingDirectivesFirst": true,
+      "usingDirectivesPlacement": "outsideNamespace"
+    }
+  }
+}

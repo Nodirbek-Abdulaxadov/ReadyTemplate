@@ -1,0 +1,230 @@
+{
+  "$schema": "https://json-schema.org/draft-07/schema",
+  "$id": "./stylecop.schema.json",
+  "title": "StyleCop Analyzers Configuration",
+  "description": "Local schema for StyleCop configuration used by this workspace.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "$schema": {
+      "type": "string"
+    },
+    "settings": {
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "indentation": {
+          "type": "object",
+          "additionalProperties": true,
+          "properties": {
+            "indentationSize": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "tabSize": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "useTabs": {
+              "type": "boolean"
+            }
+          }
+        },
+        "spacingRules": {
+          "type": "object",
+          "additionalProperties": true
+        },
+        "readabilityRules": {
+          "type": "object",
+          "additionalProperties": true,
+          "properties": {
+            "allowBuiltInTypeAliases": {
+              "type": "boolean"
+            }
+          }
+        },
+        "orderingRules": {
+          "type": "object",
+          "additionalProperties": true,
+          "properties": {
+            "elementOrder": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": [
+                  "accessibility",
+                  "kind",
+                  "constant",
+                  "static",
+                  "readonly"
+                ]
+              },
+              "uniqueItems": true
+            },
+            "systemUsingDirectivesFirst": {
+              "type": "boolean"
+            },
+            "usingDirectivesPlacement": {
+              "type": "string",
+              "enum": [
+                "insideNamespace",
+                "outsideNamespace",
+                "preserve"
+              ]
+            },
+            "blankLinesBetweenUsingGroups": {
+              "type": "string",
+              "enum": [
+                "allow",
+                "require",
+                "omit"
+              ]
+            }
+          }
+        },
+        "namingRules": {
+          "type": "object",
+          "additionalProperties": true,
+          "properties": {
+            "allowCommonHungarianPrefixes": {
+              "type": "boolean"
+            },
+            "allowedHungarianPrefixes": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "pattern": "^[a-z]{1,2}$"
+              },
+              "uniqueItems": true
+            },
+            "allowedNamespaceComponents": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "uniqueItems": true
+            },
+            "includeInferredTupleElementNames": {
+              "type": "boolean"
+            },
+            "tupleElementNameCasing": {
+              "type": "string",
+              "enum": [
+                "camelCase",
+                "PascalCase"
+              ]
+            }
+          }
+        },
+        "maintainabilityRules": {
+          "type": "object",
+          "additionalProperties": true,
+          "properties": {
+            "topLevelTypes": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": [
+                  "class",
+                  "interface",
+                  "struct",
+                  "delegate",
+                  "enum"
+                ]
+              },
+              "uniqueItems": true
+            }
+          }
+        },
+        "layoutRules": {
+          "type": "object",
+          "additionalProperties": true,
+          "properties": {
+            "newlineAtEndOfFile": {
+              "type": "string",
+              "enum": [
+                "allow",
+                "require",
+                "omit"
+              ]
+            },
+            "allowConsecutiveUsings": {
+              "type": "boolean"
+            },
+            "allowDoWhileOnClosingBrace": {
+              "type": "boolean"
+            }
+          }
+        },
+        "documentationRules": {
+          "type": "object",
+          "additionalProperties": true,
+          "properties": {
+            "documentExposedElements": {
+              "type": "boolean"
+            },
+            "documentInternalElements": {
+              "type": "boolean"
+            },
+            "documentPrivateElements": {
+              "type": "boolean"
+            },
+            "documentInterfaces": {
+              "type": [
+                "string",
+                "boolean"
+              ],
+              "enum": [
+                "all",
+                "exposed",
+                "none",
+                true,
+                false
+              ]
+            },
+            "documentPrivateFields": {
+              "type": "boolean"
+            },
+            "companyName": {
+              "type": "string"
+            },
+            "copyrightText": {
+              "type": "string"
+            },
+            "variables": {
+              "type": "object",
+              "additionalProperties": {
+                "type": "string"
+              }
+            },
+            "xmlHeader": {
+              "type": "boolean"
+            },
+            "headerDecoration": {
+              "type": "string"
+            },
+            "fileNamingConvention": {
+              "type": "string",
+              "enum": [
+                "stylecop",
+                "metadata"
+              ]
+            },
+            "documentationCulture": {
+              "type": "string"
+            },
+            "excludeFromPunctuationCheck": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "required": [
+    "settings"
+  ]
+}

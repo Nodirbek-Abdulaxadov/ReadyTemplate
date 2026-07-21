@@ -19,6 +19,7 @@ A ready-to-use **.NET 10** Web API template built with Clean Architecture, minim
 - 🚨 **Global exception handling** — `ProblemDetails` responses with custom `NotFoundException` / `BadRequestException`
 - 📖 **Swagger (NSwag)** — enabled in Development
 - 🐳 **Docker** — multi-stage `Dockerfile` for the API + Docker Compose for PostgreSQL 17
+- 📊 **OpenTelemetry** — tracing, metrics, and logging for ASP.NET Core, HttpClient, and Npgsql, exported over OTLP to a bundled Grafana [OTEL-LGTM](https://github.com/grafana/docker-otel-lgtm) stack
 - 🔄 **Auto-migrations** — database is migrated on startup in Development
 - 🧹 **Code quality built in** — `Directory.Build.props` with .NET analyzers (`latest-recommended`) + a full `.editorconfig`, enforced on every build
 - 🔁 **CI with GitHub Actions** — build with `-warnaserror` + Docker image check on every push/PR
@@ -29,7 +30,7 @@ A ready-to-use **.NET 10** Web API template built with Clean Architecture, minim
 .github/workflows/build.yml  # CI: build (-warnaserror) + Docker image
 Directory.Build.props        # Shared MSBuild settings for all projects
 .editorconfig                # Code style & analyzer rules
-docker-compose.yml           # PostgreSQL 17 for local development
+docker-compose.yml           # PostgreSQL 17 + Grafana OTEL-LGTM stack for local development
 src/
 ├── Domain/                  # Entities, enums, base types — no dependencies
 │   ├── Common/              #   BaseEntity (Id, CreatedAt, UpdatedAt, Status)
@@ -52,7 +53,8 @@ src/
 └── Server/                  # ASP.NET Core host
     ├── Dockerfile           #   Multi-stage image build (context = repo root)
     ├── Endpoints/           #   Minimal API endpoint groups
-    └── Infrastructure/      #   CurrentRequestService, GlobalExceptionHandler
+    └── Infrastructure/      #   CurrentRequestService, GlobalExceptionHandler,
+                             #   ObservabilitySetup (OpenTelemetry wiring)
 ```
 
 ## Getting Started
@@ -79,6 +81,10 @@ In Development the app applies EF migrations automatically and opens Swagger UI:
 
 - Swagger: http://localhost:5246/swagger
 - API base: `http://localhost:5246/api`
+
+Telemetry (traces, metrics, logs) is exported to the OTEL-LGTM container started by `docker compose`. Explore it in Grafana:
+
+- Grafana: http://localhost:3003 (pre-provisioned with Tempo, Loki, and Prometheus data sources)
 
 ### 3. (Optional) Build the API as a Docker image
 
@@ -149,6 +155,9 @@ Timestamps, soft delete, and audit logging work automatically for any entity inh
 |---------|-------|---------|
 | `ConnectionStrings:Default` | `appsettings.Development.json` | local Docker Postgres |
 | `Cors:Origins` | `appsettings*.json` | empty (add your frontend origins) |
+| `OpenTelemetry:Endpoint` | `appsettings.Development.json` | `http://localhost:4317` (OTLP gRPC) |
+| `OpenTelemetry:ServiceName` | `appsettings.Development.json` | `ReadyTemplate` |
+| `OpenTelemetry:Protocol` | `appsettings*.json` | `grpc` (or `http` for OTLP HTTP) |
 | `POSTGRES_PORT` / `POSTGRES_DB` / `POSTGRES_USER` / `POSTGRES_PASSWORD` | `.env` | see `.env.example` |
 
 ## Tech Stack
@@ -161,6 +170,7 @@ Timestamps, soft delete, and audit logging work automatically for any entity inh
 | Npgsql.EntityFrameworkCore.PostgreSQL | EF Core provider |
 | EFCore.NamingConventions | `snake_case` tables/columns |
 | NSwag.AspNetCore | OpenAPI / Swagger UI |
+| OpenTelemetry (+ AspNetCore / Http / Runtime / Npgsql instrumentation) | Traces, metrics & logs over OTLP |
 
 ## License
 

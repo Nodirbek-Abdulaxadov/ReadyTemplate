@@ -1,4 +1,4 @@
-var builder = WebApplication.CreateBuilder(args);
+﻿var builder = WebApplication.CreateBuilder(args);
 var services = builder.Services;
 var cfg = builder.Configuration;
 
@@ -18,10 +18,11 @@ services.AddInfrastructure(cfg);
 services.AddCors(o => o.AddDefaultPolicy(p => p
     .WithOrigins(cfg.GetSection("Cors:Origins").Get<string[]>() ?? [])
     .AllowAnyHeader()
-    .AllowAnyMethod())); 
+    .AllowAnyMethod()));
 
 services.AddProblemDetails();
 services.AddExceptionHandler<GlobalExceptionHandler>();
+services.AddObservability(builder);
 
 var app = builder.Build();
 

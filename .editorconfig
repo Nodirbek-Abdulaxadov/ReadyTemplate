@@ -173,3 +173,6 @@ dotnet_diagnostic.CA1062.severity = none       # null-check public args — redu
 dotnet_diagnostic.CA2007.severity = none       # ConfigureAwait — not needed in ASP.NET Core apps
 dotnet_diagnostic.CA1303.severity = none       # literals as localized parameters
 dotnet_diagnostic.CS1591.severity = none       # missing XML docs
+
+# Fluent/builder API'lar qiymat qaytaradi va biz ishlatmaymiz — bu qoida qiymat bermaydi
+dotnet_diagnostic.IDE0058.severity = none

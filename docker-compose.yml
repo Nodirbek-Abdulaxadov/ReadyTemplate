@@ -15,6 +15,15 @@ services:
       interval: 5s
       timeout: 3s
       retries: 10
-
+  otel-lgtm:
+    image: grafana/otel-lgtm:latest
+    container_name: ready_template-otel-lgtm
+    ports:
+      - "3003:3000"   # Grafana
+      - "4317:4317"   # OTLP gRPC
+      - "4318:4318"   # OTLP HTTP
+    volumes:
+      - ready_template-lgtm-data:/data
 volumes:
   ready_template-postgres-data:
+  ready_template-lgtm-data:

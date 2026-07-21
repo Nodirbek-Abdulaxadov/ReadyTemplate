@@ -22,7 +22,8 @@ A ready-to-use **.NET 10** Web API template built with Clean Architecture, minim
 - 📊 **OpenTelemetry** — tracing, metrics, and logging for ASP.NET Core, HttpClient, and Npgsql, exported over OTLP to a bundled Grafana [OTEL-LGTM](https://github.com/grafana/docker-otel-lgtm) stack
 - 🔄 **Auto-migrations** — database is migrated on startup in Development
 - 🧹 **Code quality built in** — `Directory.Build.props` with .NET analyzers (`latest-recommended`) + a full `.editorconfig`, enforced on every build
-- 🔁 **CI with GitHub Actions** — build with `-warnaserror` + Docker image check on every push/PR
+- 🔁 **CI with GitHub Actions** — build with `-warnaserror` + tests + Docker image check on every push/PR
+- 🧪 **Tests included** — xUnit unit tests for validators, plus integration tests that spin up a real PostgreSQL via [Testcontainers](https://testcontainers.com/) and `WebApplicationFactory`, all run in CI
 
 ## Project Structure
 
@@ -55,6 +56,11 @@ src/
     ├── Endpoints/           #   Minimal API endpoint groups
     └── Infrastructure/      #   CurrentRequestService, GlobalExceptionHandler,
                              #   ObservabilitySetup (OpenTelemetry wiring)
+tests/
+├── ReadyTemplate.UnitTests/         # xUnit + FluentValidation.TestHelper (validators)
+└── ReadyTemplate.IntegrationTests/  # xUnit + Testcontainers + WebApplicationFactory
+    ├── ApiFactory.cs                #   Boots the API against a throwaway Postgres container
+    └── Todo/                        #   End-to-end tests for the Todo endpoints
 ```
 
 ## Getting Started
@@ -140,6 +146,17 @@ The `Todo` feature is the reference implementation. To add e.g. `Product`:
 
 Timestamps, soft delete, and audit logging work automatically for any entity inheriting `BaseEntity` — no extra code needed.
 
+## Testing
+
+```bash
+dotnet test
+```
+
+- **`tests/ReadyTemplate.UnitTests`** — fast, dependency-free unit tests for the `CreateTodoView` / `UpdateTodoView` validators using `FluentValidation.TestHelper`.
+- **`tests/ReadyTemplate.IntegrationTests`** — full-stack tests that host the API with `WebApplicationFactory` and a disposable PostgreSQL container via [Testcontainers](https://testcontainers.com/), then exercise the Todo endpoints end to end. **Docker must be running.**
+
+Both projects run automatically in CI via `dotnet test`.
+
 ## Code Quality & CI
 
 - **`Directory.Build.props`** centralizes `TargetFramework`, `Nullable`, `ImplicitUsings`, and analyzer settings for every project — individual `.csproj` files only declare packages and project references.
@@ -147,6 +164,7 @@ Timestamps, soft delete, and audit logging work automatically for any entity inh
 - **`.editorconfig`** defines naming rules, formatting (Allman braces), and modern C# style preferences matching the codebase.
 - **GitHub Actions** (`.github/workflows/build.yml`) runs on every push/PR to `master`:
   - `dotnet build -c Release -warnaserror` — any analyzer warning fails the build
+  - `dotnet test` — runs the unit and integration test suites
   - `docker build` — verifies the API image still builds
 
 ## Configuration
@@ -171,6 +189,10 @@ Timestamps, soft delete, and audit logging work automatically for any entity inh
 | EFCore.NamingConventions | `snake_case` tables/columns |
 | NSwag.AspNetCore | OpenAPI / Swagger UI |
 | OpenTelemetry (+ AspNetCore / Http / Runtime / Npgsql instrumentation) | Traces, metrics & logs over OTLP |
+| xUnit | Unit & integration test framework |
+| Testcontainers.PostgreSql | Disposable PostgreSQL for integration tests |
+| Microsoft.AspNetCore.Mvc.Testing | `WebApplicationFactory` in-memory host |
+| AwesomeAssertions | Fluent test assertions |
 
 ## License
 

@@ -12,4 +12,8 @@
     <Project Path="src/Infrastructure/Infrastructure.csproj" />
     <Project Path="src/Server/Server.csproj" />
   </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/ReadyTemplate.IntegrationTests/ReadyTemplate.IntegrationTests.csproj" />
+    <Project Path="tests/ReadyTemplate.UnitTests/ReadyTemplate.UnitTests.csproj" />
+  </Folder>
 </Solution>

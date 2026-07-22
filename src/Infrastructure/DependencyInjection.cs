@@ -16,6 +16,9 @@ public static class DependencyInjection
 
         services.AddScoped<IApplicationDbContext>(sp => sp.GetRequiredService<ApplicationDbContext>());
 
+        services.AddHealthChecks()
+            .AddDbContextCheck<ApplicationDbContext>("database", tags: ["ready"]);
+
         return services;
     }
 }

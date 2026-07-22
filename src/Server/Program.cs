@@ -39,6 +39,7 @@ app.UseHttpsRedirection();
 app.UseCors();
 app.MapTodoEndpoints();
 
-await DefaultDataInitializerService.InitializeDatabaseAsync(app.Services);
+if (cfg.GetValue<bool>("Database:AutoMigrate"))
+    await DefaultDataInitializerService.InitializeDatabaseAsync(app.Services);
 
 app.Run();

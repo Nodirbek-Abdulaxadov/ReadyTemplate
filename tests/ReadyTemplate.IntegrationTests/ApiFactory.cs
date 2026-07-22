@@ -12,6 +12,7 @@ public sealed class ApiFactory(string connectionString) : WebApplicationFactory<
             {
                 ["ConnectionStrings:Default"] = connectionString,
                 ["OpenTelemetry:Endpoint"] = string.Empty,   // testda tashqi OTLP yubormaymiz
+                ["Database:AutoMigrate"] = "true",            // test ham startup migration qilsin
             });
         });
     }

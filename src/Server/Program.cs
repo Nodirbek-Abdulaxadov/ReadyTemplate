@@ -33,6 +33,10 @@ if (app.Environment.IsDevelopment())
     app.UseOpenApi();
     app.UseSwaggerUi();
 }
+else
+{
+    app.UseHsts();
+}
 
 app.MapHealthEndpoints();
 app.UseHttpsRedirection();

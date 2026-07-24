@@ -2,12 +2,13 @@
 
 [![Build](https://github.com/Nodirbek-Abdulaxadov/ReadyTemplate/actions/workflows/build.yml/badge.svg)](https://github.com/Nodirbek-Abdulaxadov/ReadyTemplate/actions/workflows/build.yml)
 
-A ready-to-use **.NET 10** Web API template built with Clean Architecture, minimal APIs, and PostgreSQL. Clone it, rename it, and start building features — the plumbing is already done.
+A ready-to-use **.NET 10** Web API template built as a **Modular Monolith** with minimal APIs and PostgreSQL. Clone it, rename it, and start adding modules — the plumbing is already done.
 
 ## Features
 
 - ⚡ **Minimal APIs** — endpoint groups, no controllers
-- 🧅 **Clean Architecture** — `Domain` → `Application` → `Infrastructure` → `Server`
+- 🧱 **Modular Monolith** — self-contained feature modules behind a shared `BuildingBlocks` kernel, wired into the host through a single `IModule` contract. Each module owns its domain, application logic, endpoints, and its own database schema + migrations
+- 🗄️ **Schema-per-module isolation** — every module gets its own PostgreSQL schema (e.g. `todos`) and its own migrations history table, so modules never share tables
 - 📬 **CQRS with [PediatR](https://www.nuget.org/packages/PediatR)** — lightweight MediatR-compatible mediator with `[Query]` / `[Command]` feature classes
 - ✅ **FluentValidation** — wired into the pipeline via `ValidationBehaviour`
 - 🗺️ **[Mapperly](https://mapperly.riok.app/)** — compile-time source-generated mapping (zero reflection)
@@ -28,34 +29,38 @@ A ready-to-use **.NET 10** Web API template built with Clean Architecture, minim
 ## Project Structure
 
 ```
-.github/workflows/build.yml  # CI: build (-warnaserror) + Docker image
-Directory.Build.props        # Shared MSBuild settings for all projects
-.editorconfig                # Code style & analyzer rules
-docker-compose.yml           # PostgreSQL 17 + Grafana OTEL-LGTM stack for local development
+.github/workflows/build.yml    # CI: build (-warnaserror) + Docker image
+Directory.Build.props          # Shared MSBuild settings for all projects
+.editorconfig                  # Code style & analyzer rules
+docker-compose.yml             # PostgreSQL 17 + Grafana OTEL-LGTM stack for local development
 src/
-├── Domain/                  # Entities, enums, base types — no dependencies
-│   ├── Common/              #   BaseEntity (Id, CreatedAt, UpdatedAt, Status)
-│   ├── Entities/            #   Todo, Audit
-│   └── Enums/               #   Status, ActionType
-├── Application/             # Business logic
-│   ├── Common/
-│   │   ├── Behaviours/      #   ValidationBehaviour (pipeline)
-│   │   ├── Exceptions/      #   NotFoundException, BadRequestException
-│   │   ├── Extensions/      #   TableOptions, TableResponse, query helpers
-│   │   └── Interfaces/      #   IApplicationDbContext, ICurrentRequestService
-│   └── Features/
-│       └── Todo/            #   Feature slice: commands, validators, views, mapper
-├── Infrastructure/          # Data access
-│   ├── Data/
-│   │   ├── Configurations/  #   EF entity configurations
-│   │   └── Interceptors/    #   DefaultInterceptor (timestamps, soft delete)
-│   │                        #   AuditInterceptor (audit trail)
-│   └── Migrations/
-└── Server/                  # ASP.NET Core host
-    ├── Dockerfile           #   Multi-stage image build (context = repo root)
-    ├── Endpoints/           #   Minimal API endpoint groups
-    └── Infrastructure/      #   CurrentRequestService, GlobalExceptionHandler,
-                             #   ObservabilitySetup (OpenTelemetry wiring)
+├── BuildingBlocks/            # Shared kernel — cross-cutting, module-agnostic
+│   ├── Domain/                #   BaseEntity, AuditEntity, Status, ActionType
+│   ├── Application/
+│   │   ├── Behaviours/        #   ValidationBehaviour (mediator pipeline)
+│   │   ├── Exceptions/        #   NotFoundException, BadRequestException
+│   │   ├── Extensions/        #   TableOptions, TableResponse, query helpers
+│   │   ├── Interfaces/        #   ICurrentRequestService
+│   │   └── Modules/           #   IModule — the contract every module implements
+│   └── Infrastructure/
+│       ├── Persistence/       #   ModuleDbContext base, AuditConfiguration,
+│       │   └── Interceptors/  #   DefaultInterceptor (timestamps, soft delete)
+│       │                      #   AuditInterceptor (audit trail)
+│       └── ModuleRegistration #   AddModules / MapModuleEndpoints / InitializeModulesAsync
+├── Modules/                   # One self-contained vertical slice per module
+│   └── Todos/                 #   The reference module
+│       ├── TodosModule.cs     #     IModule impl: registers services + endpoints + migrations
+│       ├── Domain/            #     TodoEntity
+│       ├── Application/       #     ITodosDbContext, TodoFeatures, commands, views, validators, mapper
+│       ├── Infrastructure/    #     TodosDbContext (schema "todos"), configs, migrations
+│       └── Endpoints/         #     TodoEndpoints (minimal API group)
+└── Bootstrapper/
+    └── Api/                   # ASP.NET Core host — owns no business logic
+        ├── Program.cs         #   Composes the modules: `IModule[] modules = [new TodosModule()]`
+        ├── Dockerfile         #   Multi-stage image build (context = repo root)
+        ├── Endpoints/         #   Cross-cutting endpoints (health checks)
+        └── Infrastructure/    #   CurrentRequestService, GlobalExceptionHandler,
+                               #   ObservabilitySetup (OpenTelemetry wiring)
 tests/
 ├── ReadyTemplate.UnitTests/         # xUnit + FluentValidation.TestHelper (validators)
 └── ReadyTemplate.IntegrationTests/  # xUnit + Testcontainers + WebApplicationFactory
@@ -80,7 +85,7 @@ docker compose up -d
 ### 2. Run the API
 
 ```bash
-dotnet run --project src/Server
+dotnet run --project src/Bootstrapper/Api
 ```
 
 In Development the app applies EF migrations automatically and opens Swagger UI:
@@ -95,7 +100,7 @@ Telemetry (traces, metrics, logs) is exported to the OTEL-LGTM container started
 ### 3. (Optional) Build the API as a Docker image
 
 ```bash
-docker build -f src/Server/Dockerfile -t readytemplate .
+docker build -f src/Bootstrapper/Api/Dockerfile -t readytemplate .
 ```
 
 > The Dockerfile context is the repo root (it needs `Directory.Build.props`), so always build from the repository root.
@@ -126,25 +131,33 @@ Response shape (`TableResponse<T>`):
 }
 ```
 
-## Adding a New Feature
+## Adding a New Module
 
-The `Todo` feature is the reference implementation. To add e.g. `Product`:
+The `Todos` module is the reference implementation. To add e.g. a `Products` module:
 
-1. **Domain** — add `Product` entity inheriting `BaseEntity`, plus an EF configuration in `Infrastructure/Data/Configurations`.
-2. **Application** — create `Features/Product/` with:
+1. **Create the project** — `src/Modules/Products/Products.csproj`, referencing `BuildingBlocks` (copy `Todos.csproj` as a starting point).
+2. **Domain** — add a `ProductEntity` inheriting `BaseEntity`.
+3. **Application** — add:
+   - `IProductsDbContext` — exposes the module's `DbSet`s
    - `ProductFeatures.cs` — a feature class with `[Query]` / `[Command]` methods
-   - `Commands/` — command records wrapping the views
-   - `Views/` — request/response DTOs
-   - `Validators/` — FluentValidation validators (run automatically in the pipeline)
-   - `Mapping/` — a Mapperly `[Mapper]` class
-3. **Infrastructure** — add `DbSet<Product>` to `ApplicationDbContext` / `IApplicationDbContext`, then:
+   - `Commands/`, `Views/`, `Validators/`, `Mapping/` — as in `Todos`
+4. **Infrastructure** — add `ProductsDbContext : ModuleDbContext` with its own `Schema` (e.g. `"products"`), plus EF configurations, then generate migrations into the module:
    ```bash
-   dotnet ef migrations add AddProduct --project src/Infrastructure --startup-project src/Server
+   dotnet ef migrations add InitialCreate \
+     --project src/Modules/Products/Products.csproj \
+     --startup-project src/Bootstrapper/Api/Api.csproj \
+     --context ProductsDbContext \
+     --output-dir Infrastructure/Migrations
    ```
-4. **Server** — add `ProductEndpoints.cs` and map it in `Program.cs`.
-5. **Register** — add `services.AddScoped<ProductFeatures>()` in `Application/DependencyInjection.cs`.
+5. **Endpoints** — add `ProductEndpoints.cs` with a `MapProductEndpoints` extension.
+6. **Module class** — implement `ProductsModule : IModule` (register the `DbContext`, features, health check; map endpoints; migrate on `InitializeAsync`).
+7. **Register** — add the module to the host in `src/Bootstrapper/Api/Program.cs`:
+   ```csharp
+   IModule[] modules = [new TodosModule(), new ProductsModule()];
+   ```
+   That single line is the only change to the host — validators and mediator handlers are discovered from the module assembly automatically.
 
-Timestamps, soft delete, and audit logging work automatically for any entity inheriting `BaseEntity` — no extra code needed.
+Timestamps, soft delete, and audit logging work automatically for any entity inheriting `BaseEntity` — no extra code needed. Each module gets its own audit table inside its own schema.
 
 ## Testing
 

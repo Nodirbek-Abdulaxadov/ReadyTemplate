@@ -1,3 +1,3 @@
-﻿global using Application.Features.Todo.Validators;
-global using Application.Features.Todo.Views;
+global using Todos.Application.Validators;
+global using Todos.Application.Views;
 global using FluentValidation.TestHelper;

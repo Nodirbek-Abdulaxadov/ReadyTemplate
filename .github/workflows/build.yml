@@ -36,4 +36,4 @@ jobs:
         uses: actions/checkout@v5
 
       - name: Build image
-        run: docker build -f src/Server/Dockerfile -t readytemplate:ci .
+        run: docker build -f src/Bootstrapper/Api/Dockerfile -t readytemplate:ci .

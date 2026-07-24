@@ -4,6 +4,6 @@ global using Microsoft.Extensions.Configuration;
 global using Testcontainers.PostgreSql;
 global using System.Net;
 global using System.Net.Http.Json;
-global using Application.Common.Extensions;
-global using Application.Features.Todo.Views;
+global using BuildingBlocks.Application.Extensions;
+global using Todos.Application.Views;
 global using AwesomeAssertions;

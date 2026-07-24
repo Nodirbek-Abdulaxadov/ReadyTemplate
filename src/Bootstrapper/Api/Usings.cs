@@ -1,0 +1,13 @@
+global using System.Text.Json;
+global using Api.Endpoints;
+global using Api.Infrastructure;
+global using BuildingBlocks.Application.Exceptions;
+global using BuildingBlocks.Application.Interfaces;
+global using BuildingBlocks.Application.Modules;
+global using BuildingBlocks.Infrastructure;
+global using FluentValidation;
+global using Microsoft.AspNetCore.Diagnostics;
+global using Microsoft.AspNetCore.Diagnostics.HealthChecks;
+global using Microsoft.AspNetCore.Mvc;
+global using Microsoft.Extensions.Diagnostics.HealthChecks;
+global using Todos;

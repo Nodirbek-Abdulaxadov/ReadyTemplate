@@ -7,10 +7,15 @@
     <File Path="README.md" />
   </Folder>
   <Folder Name="/src/">
-    <Project Path="src/Application/Application.csproj" />
-    <Project Path="src/Domain/Domain.csproj" />
-    <Project Path="src/Infrastructure/Infrastructure.csproj" />
-    <Project Path="src/Server/Server.csproj" />
+    <Folder Name="/src/BuildingBlocks/">
+      <Project Path="src/BuildingBlocks/BuildingBlocks.csproj" />
+    </Folder>
+    <Folder Name="/src/Bootstrapper/">
+      <Project Path="src/Bootstrapper/Api/Api.csproj" />
+    </Folder>
+    <Folder Name="/src/Modules/">
+      <Project Path="src/Modules/Todos/Todos.csproj" />
+    </Folder>
   </Folder>
   <Folder Name="/tests/">
     <Project Path="tests/ReadyTemplate.IntegrationTests/ReadyTemplate.IntegrationTests.csproj" />

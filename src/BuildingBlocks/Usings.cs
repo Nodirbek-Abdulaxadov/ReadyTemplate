@@ -1,0 +1,17 @@
+global using System.Linq.Expressions;
+global using System.Reflection;
+global using BuildingBlocks.Application.Behaviours;
+global using BuildingBlocks.Application.Interfaces;
+global using BuildingBlocks.Application.Modules;
+global using BuildingBlocks.Domain;
+global using BuildingBlocks.Infrastructure.Persistence;
+global using BuildingBlocks.Infrastructure.Persistence.Interceptors;
+global using FluentValidation;
+global using Microsoft.AspNetCore.Builder;
+global using Microsoft.AspNetCore.Routing;
+global using Microsoft.EntityFrameworkCore;
+global using Microsoft.EntityFrameworkCore.Diagnostics;
+global using Microsoft.EntityFrameworkCore.Metadata.Builders;
+global using Microsoft.Extensions.Configuration;
+global using Microsoft.Extensions.DependencyInjection;
+global using PediatR;

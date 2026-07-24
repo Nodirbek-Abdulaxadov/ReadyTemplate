@@ -19,7 +19,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\Server\Server.csproj" />
+    <ProjectReference Include="..\..\src\Bootstrapper\Api\Api.csproj" />
   </ItemGroup>
 
   <ItemGroup>

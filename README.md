@@ -68,6 +68,24 @@ tests/
     └── Todo/                        #   End-to-end tests for the Todo endpoints
 ```
 
+## Documentation
+
+Full docs live in [`docs/`](docs/README.md):
+
+| Doc | What it covers |
+|-----|----------------|
+| [Getting Started](docs/getting-started.md) | Prerequisites, running the API, database, Swagger, telemetry |
+| [Architecture](docs/architecture.md) | Modular monolith principles, dependency rules, project map |
+| [Building Blocks](docs/building-blocks.md) | The shared kernel: base types, exceptions, extensions, interceptors, registration |
+| [Modules](docs/modules.md) | Module anatomy, the `IModule` contract, and its lifecycle |
+| [Adding a Module](docs/adding-a-module.md) | End-to-end walkthrough for a new module |
+| [Persistence](docs/persistence.md) | Schema-per-module, migrations, audit trail, soft delete, GUID v7 |
+| [CQRS & Validation](docs/cqrs-validation.md) | Feature classes, PediatR, FluentValidation pipeline, Mapperly |
+| [API & Endpoints](docs/api-and-endpoints.md) | Minimal API groups, table queries, error handling, health checks |
+| [Observability](docs/observability.md) | OpenTelemetry traces, metrics, logs over OTLP |
+| [Testing](docs/testing.md) | Unit tests and Testcontainers-backed integration tests |
+| [Configuration](docs/configuration.md) | `appsettings`, environment variables, CORS, feature flags |
+
 ## Getting Started
 
 ### Prerequisites
